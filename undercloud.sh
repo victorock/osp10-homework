@@ -301,9 +301,12 @@ neutron router-interface-add internal_router internal_subnet
 echo "create security group for overcloud"
 openstack security group create test
 
+echo "register security key"
+openstack keypair create --public-key ~/.ssh/id_rsa.pub stack
+
 echo "create instance connected to the internal network"
 internal_net=$(openstack network show internal -c id -f value)
-openstack server create overcloud-test --security-group test --image cirros --flavor m1.tiny --nic net-id=$internal_net
+openstack server create overcloud-test --security-group test --key-name stack --image cirros --flavor m1.tiny --nic net-id=$internal_net
 
 echo "create floating ip from external (management) network"
 openstack ip floating create management
