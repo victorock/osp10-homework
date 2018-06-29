@@ -304,19 +304,21 @@ openstack security group create test
 echo "register security key"
 openstack keypair create --public-key ~/.ssh/id_rsa.pub stack
 
+echo "download and register cirros image"
+curl http://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img | openstack image create --disk-format qcow2 --public cirros
+
+echo "create flavor (m1.tiny) with 512mb 1vcpu 1 disk (ephemeral) of 1gb"
+openstack flavor create --ram 512 --vcpus 1 --ephemeral 1 m1.tiny
+
 echo "create instance connected to the internal network"
 internal_net=$(openstack network show internal -c id -f value)
 openstack server create overcloud-test --security-group test --key-name stack --image cirros --flavor m1.tiny --nic net-id=$internal_net
 
-echo "create floating ip from external (management) network"
-openstack floating ip create management
-openstack floating ip list
-
-echo "copy floating ip and paste"
-read floatingipnoted
+echo "create floating ip 172.16.0.218 from external (management) network"
+openstack floating ip create --floating-ip-address 172.16.0.218 management
 
 echo "add floating ip to the instance"
-openstack server add floating ip overcloud-test "${floatingipnoted}"
+openstack server add floating ip overcloud-test 172.16.0.218
 
 echo "add rules for icmp and ssh to the default security-group"
 openstack security group rule create test --dst-port 22
