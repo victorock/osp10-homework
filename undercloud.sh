@@ -259,10 +259,10 @@ openstack overcloud deploy \
     -e ~/templates/myparameters.yaml \
     -e ~/templates/deployment-artifacts.yaml
 
+echo "validations"
 echo "list stack failures"
 openstack stack failures list overcloud
 
-echo "validations"
 echo "list servers"
 openstack server list
 
