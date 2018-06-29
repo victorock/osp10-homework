@@ -1,11 +1,16 @@
 #!/bin/bash
 
+ssh-keygen
+
 useradd stack
 echo 'r3dh4t1!' | passwd stack --stdin
 echo 'stack ALL=(root) NOPASSWD:ALL' | tee -a /etc/sudoers.d/stack
 chmod 0440 /etc/sudoers.d/stack
 
 sudo su - stack
+
+echo "generate ssh key"
+ssh-keygen
 
 echo "Copy ssh from undercloud to host"
 ssh-copy-id 192.168.0.1
@@ -16,6 +21,9 @@ sudo systemctl restart network.service
 
 echo "Download repo"
 sudo curl -o /etc/yum.repos.d/open.repo http://classroom/open.repo
+
+echo "install screen"
+sudo yum -y install screen
 
 echo "configure /etc/hosts"
 sudo yum -y install facter
@@ -53,6 +61,11 @@ openstack undercloud install
 
 echo "load stackrc"
 . ~/stackrc
+
+echo "create artifact for repo"
+sudo tar -czvf /etc/yum.repos.d/open.repo ~/repo-artifact.tgz
+upload-swift-artifacts -f ~/repo-artifact.tgz \
+  --environment ~/templates/deployment-artifacts.yaml
 
 echo "download images"
 mkdir ~/images
@@ -239,7 +252,8 @@ openstack overcloud deploy \
     --compute-flavor compute \
     --ceph-storage-flavor ceph-storage \
     -e ~/templates/disable_ceilometer.yaml \
-    -e ~/templates/myparameters.yaml
+    -e ~/templates/myparameters.yaml \
+    -e ~/templates/deployment-artifacts.yaml
 
 echo "list stack failures"
 openstack stack failures list overcloud
