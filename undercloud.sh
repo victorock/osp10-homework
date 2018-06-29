@@ -63,7 +63,8 @@ echo "load stackrc"
 . ~/stackrc
 
 echo "create artifact for repo"
-sudo tar -czvf /etc/yum.repos.d/open.repo ~/repo-artifact.tgz
+cd ~
+sudo tar -czvf repo-artifact.tgz /etc/yum.repos.d/open.repo
 upload-swift-artifacts -f ~/repo-artifact.tgz \
   --environment ~/templates/deployment-artifacts.yaml
 
