@@ -14,13 +14,13 @@ echo "set hostname"
 sudo hostnamectl set-hostname undercloud.example.com
 sudo systemctl restart network.service
 
+echo "Download repo"
+sudo curl -o /etc/yum.repos.d/open.repo http://classroom/open.repo
+
 echo "configure /etc/hosts"
 sudo yum -y install facter
 ipaddr=$(facter ipaddress_eth1)
-sudo echo -e "${ipaddr}\tundercloud undercloud.example.com" >> /etc/hosts
-
-echo "download repo"
-sudo curl -o /etc/yum.repos.d/open.repo http://classroom/open.repo
+echo -e "${ipaddr}\tundercloud undercloud.example.com" | sudo tee -a /etc/hosts
 
 echo "update the undercloud"
 sudo yum update -y
@@ -32,7 +32,7 @@ sudo yum install -y python-tripleoclient \
   openstack-tripleo-heat-templates-compat
 
 echo "create undercloud config"
-echo << EOF > ~/undercloud.conf
+cat << EOF > ~/undercloud.conf
 [DEFAULT]
 local_ip = 172.16.0.1/24
 undercloud_public_vip = 172.16.0.10
@@ -64,6 +64,10 @@ tar xvf overcloud-full-osp10.tar
 
 echo "upload image"
 openstack overcloud image upload
+
+echo "go to host and generate the nodest.txt (see host.sh)."
+echo "Hit enter when done"
+read runhost
 
 echo "generate the stackenv for instrospection"
 jq . << EOF > ~/instackenv.json
@@ -184,8 +188,14 @@ echo "copy templates directory to homedir"
 cp -ap /usr/share/openstack-tripleo-heat-templates/ ~/templates
 
 
+echo "create template for parameters: timezone"
+cat << EOF > ~/templates/myparameters.yaml
+parameter_defaults:
+  TimeZone: 'EST'
+EOF
+
 echo "create template to disable ceilometer"
-echo << EOF > ~/templates/disable_ceilometer.yaml
+cat << EOF > ~/templates/disable_ceilometer.yaml
 resource_registry:
   OS::TripleO::Services::MongoDb: OS::Heat::None
   OS::TripleO::Services::CeilometerApi: OS::Heat::None
@@ -228,7 +238,8 @@ openstack overcloud deploy \
     --control-flavor control \
     --compute-flavor compute \
     --ceph-storage-flavor ceph-storage \
-    -e ~/templates/disable_ceilometer.yaml
+    -e ~/templates/disable_ceilometer.yaml \
+    -e ~/templates/myparameters.yaml
 
 echo "list stack failures"
 openstack stack failures list overcloud
