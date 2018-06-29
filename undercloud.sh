@@ -60,7 +60,7 @@ EOF
 echo "install undercloud"
 openstack undercloud install
 
-echo "check if installed fine"
+echo "check if catalog is installed fine"
 openstack catalog list
 
 echo "load stackrc"
@@ -271,6 +271,9 @@ echo "load overcloudrc"
 
 echo "list compute services"
 openstack compute service list
+
+echo "list hypervisors"
+openstack hypervisor list
 
 echo "validate overcloud"
 neutron net-create external --router:external True --provider:network_type flat --provider:physical_network datacentre
