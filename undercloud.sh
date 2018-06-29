@@ -277,30 +277,40 @@ openstack hypervisor list
 
 echo "validate overcloud"
 
-echo "create external network"
-neutron net-create --router:external True --provider:network_type flat --provider:physical_network datacentre external
-neutron subnet-create --name external --gateway 192.168.0.1 --allocation-pool start=192.168.0.151,end=192.168.0.200 --disable-dhcp external 192.168.0.0/24
+echo "create network external with management subnet"
+neutron net-create management --router:external --provider:network_type flat --provider:physical_network datacentre
 
-echo "create internal network test"
-neutron net-create test
-neutron subnet-create --name test --gateway 192.168.123.254 --allocation-pool start=192.168.123.1,end=192.168.123.253 --dns-nameserver 10.12.50.1 test 192.168.123.0/24
+echo "create management subnet"
+neutron subnet-create management 172.16.0.0/24 --name management_subnet --enable-dhcp=False --allocation-pool start=172.16.0.210,end=172.16.0.230 --dns-nameserver 8.8.8.8
 
-echo "create internal router"
-neutron router-create test
-neutron router-gateway-set test external
-neutron router-interface-add test test
+echo "create internal network"
+openstack network create internal
 
-echo "create security group"
-neutron security-group-create test
-neutron security-group-rule-create --direction ingress --ethertype IPv4 --protocol tcp --port-range-min 22 --port-range-max 22 test
-neutron security-group-rule-create --direction ingress --ethertype IPv4 --protocol icmp test
+echo "create subnet in internal network"
+neutron subnet-create internal 192.168.0.0/24 --name internal_subnet
 
-echo "register ssh-key"
-nova keypair-add --pub-key ~/.ssh/id_rsa.pub stack
+echo "create router for internal network"
+openstack router create internal_router
 
-echo "create external floating ip"
-neutron floatingip-create external
+echo "set external network (management) as default route for internal router"
+neutron router-gateway-set internal_router management
 
-curl http://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img | openstack image create --disk-format qcow2 --public cirros
-nova flavor-create m1.tiny auto 512 1 1
-nova boot --flavor m1.tiny --image cirros --key-name stack --security-groups test --nic net-name=test test
+echo "add interface connected to the internal network"
+neutron router-interface-add internal_router internal_subnet
+
+echo "create security group for overcloud"
+openstack security group create test
+
+echo "create instance connected to the internal network"
+internal_net=$(openstack network show internal -c id -f value)
+openstack server create overcloud-test --security-group test --image cirros --flavor m1.tiny --nic net-id=$internal_net
+
+echo "create floating ip from external (management) network"
+openstack ip floating create management
+
+echo "add floating ip to the instance"
+openstack ip floating add 172.16.0.218 overcloud-test
+
+echo "add rules for icmp and ssh to the default security-group"
+openstack security group rule create test --dst-port 22
+openstack security group rule create test --proto icmp
