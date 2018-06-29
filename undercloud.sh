@@ -76,7 +76,7 @@ upload-swift-artifacts -f ~/repo-artifact.tgz \
 echo "download images"
 mkdir ~/images
 cd ~/images
-curl -O http://classroom/class/osp_advanced_director/overcloud-full-osp10.tar
+tar xvf /usr/share/rhosp-director-images/overcloud-full.tar
 
 echo "unpack images"
 tar xvf /usr/share/rhosp-director-images/ironic-python-agent.tar -C .
