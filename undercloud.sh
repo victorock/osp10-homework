@@ -73,15 +73,11 @@ sudo chown stack:stack repo-artifact.tgz
 upload-swift-artifacts -f ~/repo-artifact.tgz \
   --environment ~/templates/deployment-artifacts.yaml
 
-echo "download images"
+echo "unpack images"
 mkdir ~/images
 cd ~/images
-tar xvf /usr/share/rhosp-director-images/overcloud-full.tar
-
-echo "unpack images"
+tar xvf /usr/share/rhosp-director-images/overcloud-full.tar -C .
 tar xvf /usr/share/rhosp-director-images/ironic-python-agent.tar -C .
-tar xvf overcloud-full-osp10.tar
-rm overcloud-full-osp10.tar
 
 echo "Build image and upload image"
 openstack overcloud image build --all
