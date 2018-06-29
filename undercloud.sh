@@ -276,17 +276,31 @@ echo "list hypervisors"
 openstack hypervisor list
 
 echo "validate overcloud"
-neutron net-create external --router:external True --provider:network_type flat --provider:physical_network datacentre
-neutron subnet-create --gateway 192.168.0.1 --allocation-pool start=192.168.0.151,end=192.168.0.200 --disable-dhcp external 192.168.0.0/24
-curl http://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img | openstack image create --disk-format qcow2 --public cirros
-nova flavor-create m1.tiny auto 512 1 1
+
+echo "create external network"
+neutron net-create --router:external True --provider:network_type flat --provider:physical_network datacentre external
+neutron subnet-create --name external --gateway 192.168.0.1 --allocation-pool start=192.168.0.151,end=192.168.0.200 --disable-dhcp external 192.168.0.0/24
+
+echo "create internal network test"
 neutron net-create test
 neutron subnet-create --name test --gateway 192.168.123.254 --allocation-pool start=192.168.123.1,end=192.168.123.253 --dns-nameserver 10.12.50.1 test 192.168.123.0/24
+
+echo "create internal router"
 neutron router-create test
 neutron router-gateway-set test external
 neutron router-interface-add test test
-neutron security-group-rule-create --direction ingress --ethertype IPv4 --protocol tcp --port-range-min 22 --port-range-max 22 default
-neutron security-group-rule-create --direction ingress --ethertype IPv4 --protocol icmp default
+
+echo "create security group"
+neutron security-group-create test
+neutron security-group-rule-create --direction ingress --ethertype IPv4 --protocol tcp --port-range-min 22 --port-range-max 22 test
+neutron security-group-rule-create --direction ingress --ethertype IPv4 --protocol icmp test
+
+echo "register ssh-key"
 nova keypair-add --pub-key ~/.ssh/id_rsa.pub stack
+
+echo "create external floating ip"
 neutron floatingip-create external
-nova boot --flavor m1.tiny --image cirros --key-name stack --security-groups default --nic net-name=test test
+
+curl http://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img | openstack image create --disk-format qcow2 --public cirros
+nova flavor-create m1.tiny auto 512 1 1
+nova boot --flavor m1.tiny --image cirros --key-name stack --security-groups test --nic net-name=test test

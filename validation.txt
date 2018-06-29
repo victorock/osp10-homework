@@ -1,0 +1,127 @@
+[stack@undercloud ~]$ tree -a
+.
+├── .bash_history
+├── .bash_logout
+├── .bash_profile
+├── .bashrc
+├── .cache
+│   └── image-create
+│       └── ccache
+├── images
+│   ├── dib-agent-ramdisk.log
+│   ├── ironic-python-agent.initramfs
+│   ├── ironic-python-agent.kernel
+│   ├── overcloud-full.initrd
+│   ├── overcloud-full.qcow2
+│   └── overcloud-full.vmlinuz
+├── .instack
+│   └── install-undercloud.log
+├── instackenv.json
+├── .lesshst
+├── nodes.txt
+├── .novaclient
+│   ├── 21232f297a57a5a743894a0e4a801fc3
+│   │   ├── aggregate-human-id-cache
+│   │   ├── aggregate-uuid-cache
+│   │   ├── flavor-human-id-cache
+│   │   ├── flavor-uuid-cache
+│   │   ├── hypervisor-human-id-cache
+│   │   ├── hypervisor-uuid-cache
+│   │   ├── image-human-id-cache
+│   │   ├── image-uuid-cache
+│   │   ├── keypair-human-id-cache
+│   │   ├── keypair-uuid-cache
+│   │   ├── network-human-id-cache
+│   │   ├── network-uuid-cache
+│   │   ├── server-human-id-cache
+│   │   ├── server-uuid-cache
+│   │   ├── service-human-id-cache
+│   │   └── service-uuid-cache
+│   └── d41d8cd98f00b204e9800998ecf8427e
+│       ├── flavor-human-id-cache
+│       ├── flavor-uuid-cache
+│       ├── keypair-human-id-cache
+│       └── keypair-uuid-cache
+├── overcloud-env.json
+├── overcloudrc
+├── overcloudrc.v3
+├── repo-artifact.tgz
+├── .ssh
+│   ├── id_rsa
+│   ├── id_rsa.pub
+│   └── known_hosts
+├── stackrc
+├── tempest-deployer-input.conf
+├── templates
+│   ├── deployment-artifacts.yaml
+│   ├── disable_ceilometer.yaml
+│   └── myparameters.yaml
+├── undercloud.conf
+└── undercloud-passwords.conf
+
+10 directories, 48 files
+
+[stack@undercloud ~]$ source stackrc
+[stack@undercloud ~]$ echo "validations"
+validations
+[stack@undercloud ~]$ echo "list stack failures"
+list stack failures
+[stack@undercloud ~]$ openstack stack failures list overcloud
+[stack@undercloud ~]$
+[stack@undercloud ~]$ echo "list servers"
+list servers
+[stack@undercloud ~]$ openstack server list
++--------------------------------------+-------------------------+--------+----------------------+----------------+
+| ID                                   | Name                    | Status | Networks             | Image Name     |
++--------------------------------------+-------------------------+--------+----------------------+----------------+
+| 90da0236-97be-47b4-a8f8-3a133a4e20b6 | overcloud-compute-0     | ACTIVE | ctlplane=172.16.0.35 | overcloud-full |
+| 05544edd-6d37-4234-8903-b2e185672d88 | overcloud-cephstorage-2 | ACTIVE | ctlplane=172.16.0.23 | overcloud-full |
+| 261c6c44-0ed1-4db4-85a6-f3056771e1a2 | overcloud-controller-0  | ACTIVE | ctlplane=172.16.0.30 | overcloud-full |
+| e2844b52-058a-4910-9853-64f8953d53ae | overcloud-compute-1     | ACTIVE | ctlplane=172.16.0.22 | overcloud-full |
+| 32024b03-84b0-4927-9080-50b1f0b89dbf | overcloud-controller-2  | ACTIVE | ctlplane=172.16.0.34 | overcloud-full |
+| 787b3e36-e2bf-4854-90c9-2d9dba3983c2 | overcloud-controller-1  | ACTIVE | ctlplane=172.16.0.33 | overcloud-full |
+| 9fa96a3b-35d7-4c24-ba75-70ff81dd1152 | overcloud-cephstorage-0 | ACTIVE | ctlplane=172.16.0.21 | overcloud-full |
+| 5993f962-9f77-4cf4-a962-3eef8aa4685e | overcloud-cephstorage-1 | ACTIVE | ctlplane=172.16.0.28 | overcloud-full |
++--------------------------------------+-------------------------+--------+----------------------+----------------+
+
+[stack@undercloud ~]$ echo "load overcloudrc"
+load overcloudrc
+[stack@undercloud ~]$ . ~/overcloudrc
+[stack@undercloud ~]$
+[stack@undercloud ~]$ echo "list compute services"
+list compute services
+[stack@undercloud ~]$ openstack compute service list
++----+------------------+------------------------------------+----------+---------+-------+----------------------------+
+| ID | Binary           | Host                               | Zone     | Status  | State | Updated At                 |
++----+------------------+------------------------------------+----------+---------+-------+----------------------------+
+| 11 | nova-consoleauth | overcloud-controller-1.localdomain | internal | enabled | up    | 2018-06-29T11:43:43.000000 |
+| 14 | nova-consoleauth | overcloud-controller-2.localdomain | internal | enabled | up    | 2018-06-29T11:43:46.000000 |
+| 35 | nova-scheduler   | overcloud-controller-1.localdomain | internal | enabled | up    | 2018-06-29T11:43:45.000000 |
+| 38 | nova-scheduler   | overcloud-controller-2.localdomain | internal | enabled | up    | 2018-06-29T11:43:48.000000 |
+| 41 | nova-conductor   | overcloud-controller-1.localdomain | internal | enabled | up    | 2018-06-29T11:43:50.000000 |
+| 44 | nova-conductor   | overcloud-controller-2.localdomain | internal | enabled | up    | 2018-06-29T11:43:44.000000 |
+| 47 | nova-consoleauth | overcloud-controller-0.localdomain | internal | enabled | up    | 2018-06-29T11:43:43.000000 |
+| 50 | nova-scheduler   | overcloud-controller-0.localdomain | internal | enabled | up    | 2018-06-29T11:43:45.000000 |
+| 53 | nova-conductor   | overcloud-controller-0.localdomain | internal | enabled | up    | 2018-06-29T11:43:52.000000 |
+| 59 | nova-compute     | overcloud-compute-1.localdomain    | nova     | enabled | up    | 2018-06-29T11:43:46.000000 |
+| 62 | nova-compute     | overcloud-compute-0.localdomain    | nova     | enabled | up    | 2018-06-29T11:43:46.000000 |
++----+------------------+------------------------------------+----------+---------+-------+----------------------------+
+[stack@undercloud ~]$
+
+[stack@undercloud ~]$ echo "list hypervisors"
+list hypervisors
+[stack@undercloud ~]$ openstack hypervisor list
++----+---------------------------------+
+| ID | Hypervisor Hostname             |
++----+---------------------------------+
+|  2 | overcloud-compute-0.localdomain |
+|  5 | overcloud-compute-1.localdomain |
++----+---------------------------------+
+[stack@undercloud ~]$
+
+[stack@undercloud ~]$ openstack server list
++--------------------------------------+------+--------+--------------------+------------+
+| ID                                   | Name | Status | Networks           | Image Name |
++--------------------------------------+------+--------+--------------------+------------+
+| d9f71f0b-77f5-4517-8a0a-f382e2aa52e6 | test | ACTIVE | test=192.168.123.7 | cirros     |
++--------------------------------------+------+--------+--------------------+------------+
