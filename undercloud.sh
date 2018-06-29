@@ -66,21 +66,13 @@ openstack catalog list
 echo "load stackrc"
 . ~/stackrc
 
-echo "create artifact for repo"
-cd ~
-sudo tar -czvf repo-artifact.tgz /etc/yum.repos.d/open.repo
-sudo chown stack:stack repo-artifact.tgz
-upload-swift-artifacts -f ~/repo-artifact.tgz \
-  --environment ~/templates/deployment-artifacts.yaml
-
 echo "unpack images"
 mkdir ~/images
 cd ~/images
 tar xvf /usr/share/rhosp-director-images/overcloud-full.tar -C .
 tar xvf /usr/share/rhosp-director-images/ironic-python-agent.tar -C .
 
-echo "Build image and upload image"
-openstack overcloud image build --all
+echo "upload image"
 openstack overcloud image upload
 
 echo "go to host and generate the nodest.txt (see host.sh)."
@@ -88,6 +80,7 @@ echo "Hit enter when done"
 read runhost
 
 echo "generate the stackenv for instrospection"
+cd ~
 jq . << EOF > ~/instackenv.json
 {
   "nodes": [
@@ -202,9 +195,15 @@ echo "set baremetal nodes as managed and instrospect"
 for i in $(openstack baremetal node list -c Name -f value); do openstack baremetal node manage $i; done
 openstack overcloud node introspect --all-manageable --provide
 
-echo "copy templates directory to homedir"
-cp -ap /usr/share/openstack-tripleo-heat-templates/ ~/templates
+echo "create templates directory"
+mkdir ~/templates
 
+echo "create artifact for repo"
+cd ~
+sudo tar -czvf repo-artifact.tgz /etc/yum.repos.d/open.repo
+sudo chown stack:stack repo-artifact.tgz
+upload-swift-artifacts -f ~/repo-artifact.tgz \
+  --environment ~/templates/deployment-artifacts.yaml
 
 echo "create template for parameters: timezone"
 cat << EOF > ~/templates/myparameters.yaml
@@ -246,7 +245,7 @@ EOF
 
 echo "deploy overcloud"
 openstack overcloud deploy \
-    --templates ~/templates \
+    --templates \
     --ntp-server 10.0.77.54 \
     --control-scale 3 \
     --compute-scale 2 \
