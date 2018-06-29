@@ -1,0 +1,104 @@
+instackenv.json
+{
+  "nodes": [
+    {
+      "name": "overcloud-ctrl01",
+      "capabilities": "profile:control",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 1p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    },
+    {
+      "name": "overcloud-ctrl02",
+      "capabilities": "profile:control",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 2p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    },
+    {
+      "name": "overcloud-ctrl03",
+      "capabilities": "profile:control",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 3p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    },
+    {
+      "name": "overcloud-compute01",
+      "capabilities": "profile:compute",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 4p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    },
+    {
+      "name": "overcloud-compute02",
+      "capabilities": "profile:compute",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 5p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    },
+    {
+      "name": "overcloud-ceph01",
+      "capabilities": "profile:ceph-storage",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 6p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    },
+    {
+      "name": "overcloud-ceph02",
+      "capabilities": "profile:ceph-storage",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 7p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    },
+    {
+      "name": "overcloud-ceph03",
+      "capabilities": "profile:ceph-storage",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 8p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    },
+    {
+      "name": "overcloud-networker",
+      "capabilities": "profile:networker",
+      "pm_addr": "192.168.0.1",
+      "pm_password": "{{ lookup('file', '~/.ssh/id_rsa') }}",
+      "pm_type": "pxe_ssh",
+      "mac": [
+        "$(sed -n 9p ~/nodes.txt)"
+      ],
+      "pm_user": "stack"
+    }
+  ]
+}
