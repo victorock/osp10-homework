@@ -37,7 +37,8 @@ echo "install packages"
 sudo yum install -y python-tripleoclient \
   libvirt \
   libguestfs-tools \
-  openstack-tripleo-heat-templates-compat
+  openstack-tripleo-heat-templates-compat \
+  rhosp-director-images
 
 echo "create undercloud config"
 cat << EOF > ~/undercloud.conf
@@ -59,12 +60,16 @@ EOF
 echo "install undercloud"
 openstack undercloud install
 
+echo "check if installed fine"
+openstack catalog list
+
 echo "load stackrc"
 . ~/stackrc
 
 echo "create artifact for repo"
 cd ~
 sudo tar -czvf repo-artifact.tgz /etc/yum.repos.d/open.repo
+sudo chown stack:stack repo-artifact.tgz
 upload-swift-artifacts -f ~/repo-artifact.tgz \
   --environment ~/templates/deployment-artifacts.yaml
 
@@ -73,10 +78,13 @@ mkdir ~/images
 cd ~/images
 curl -O http://classroom/class/osp_advanced_director/overcloud-full-osp10.tar
 
-echo "unpack image"
+echo "unpack images"
+tar xvf /usr/share/rhosp-director-images/ironic-python-agent.tar -C .
 tar xvf overcloud-full-osp10.tar
+rm overcloud-full-osp10.tar
 
-echo "upload image"
+echo "Build image and upload image"
+openstack overcloud image build --all
 openstack overcloud image upload
 
 echo "go to host and generate the nodest.txt (see host.sh)."
