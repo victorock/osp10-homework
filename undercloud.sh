@@ -309,10 +309,14 @@ internal_net=$(openstack network show internal -c id -f value)
 openstack server create overcloud-test --security-group test --key-name stack --image cirros --flavor m1.tiny --nic net-id=$internal_net
 
 echo "create floating ip from external (management) network"
-openstack ip floating create management
+openstack floating ip create management
+openstack floating ip list
+
+echo "copy floating ip and paste"
+read floatingipnoted
 
 echo "add floating ip to the instance"
-openstack ip floating add 172.16.0.218 overcloud-test
+openstack server add floating ip overcloud-test "${floatingipnoted}"
 
 echo "add rules for icmp and ssh to the default security-group"
 openstack security group rule create test --dst-port 22
